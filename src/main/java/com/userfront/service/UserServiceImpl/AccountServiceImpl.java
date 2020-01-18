@@ -2,6 +2,7 @@ package com.userfront.service.UserServiceImpl;
 
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,10 @@ import org.springframework.stereotype.Service;
 import com.userfront.dao.PrimaryAccountDao;
 import com.userfront.dao.SavingsAccountDao;
 import com.userfront.domain.PrimaryAccount;
+import com.userfront.domain.PrimaryTransaction;
 import com.userfront.domain.SavingsAccount;
+import com.userfront.domain.SavingsTransaction;
+import com.userfront.domain.User;
 import com.userfront.service.AccountService;
 import com.userfront.service.UserService;
 
@@ -51,16 +55,28 @@ public class AccountServiceImpl implements AccountService {
 		return ++nextAccountNumber;
 	}
 
-	@Override
 	public void deposit(String accountType, double amount, Principal principal) {
-		// TODO Auto-generated method stub
+		User user = userService.findByUsername(principal.getName());
 
-	}
+		if (accountType.equalsIgnoreCase("Primary")) {
+			PrimaryAccount primaryAccount = user.getPrimaryAccount();
+			primaryAccount.setAccountBalance(primaryAccount.getAccountBalance().add(new BigDecimal(amount)));
+			primaryAccountDao.save(primaryAccount);
 
-	@Override
-	public void withdraw(String accountType, double amount, Principal principal) {
-		// TODO Auto-generated method stub
+			Date date = new Date();
 
+			PrimaryTransaction primaryTransaction = new PrimaryTransaction(date, "Deposit to Primary Account",
+					"Account", "Finished", amount, primaryAccount.getAccountBalance(), primaryAccount);
+
+		} else if (accountType.equalsIgnoreCase("Savings")) {
+			SavingsAccount savingsAccount = user.getSavingsAccount();
+			savingsAccount.setAccountBalance(savingsAccount.getAccountBalance().add(new BigDecimal(amount)));
+			savingsAccountDao.save(savingsAccount);
+
+			Date date = new Date();
+			SavingsTransaction savingsTransaction = new SavingsTransaction(date, "Deposit to savings Account",
+					"Account", "Finished", amount, savingsAccount.getAccountBalance(), savingsAccount);
+		}
 	}
 
 }

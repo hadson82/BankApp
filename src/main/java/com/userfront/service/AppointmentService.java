@@ -7,9 +7,9 @@ import com.userfront.domain.Appointment;
 public interface AppointmentService {
 	Appointment createAppointment(Appointment appointment);
 
-    List<Appointment> findAll();
+	List<Appointment> findAll();
 
-    Appointment findAppointment(Long id);
+	Appointment findAppointment(Long id);
 
-    void confirmAppointment(Long id);
+	void confirmAppointment(Long id);
 }
